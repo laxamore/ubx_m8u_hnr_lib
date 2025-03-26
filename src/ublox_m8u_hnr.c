@@ -118,16 +118,17 @@ static void parse_ubx_hnr_pvt()
         uart_interface_s.lock();
       }
 
+      ugnss_s->fix_quality = pvt_data.gnssFix;
+
       // Update global GNSS data
-      if (pvt_data.gnssFix == TIME_ONLY_FIX)
+      if (ugnss_s->fix_quality == TIME_ONLY_FIX)
       {
         ugnss_s->timestamp =
             to_timestamp(pvt_data.year, pvt_data.month, pvt_data.day,
                          pvt_data.hour, pvt_data.min, pvt_data.sec);
       }
-      else if (pvt_data.gnssFix >= 1)
+      else if (ugnss_s->fix_quality >= 1)
       {
-        ugnss_s->fix_quality = pvt_data.gnssFix;
         ugnss_s->longitude = pvt_data.longitude;
         ugnss_s->latitude = pvt_data.latitude;
         ugnss_s->altitude = pvt_data.hMSL;         // In millimeters
