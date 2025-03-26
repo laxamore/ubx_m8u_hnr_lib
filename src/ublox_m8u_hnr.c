@@ -119,16 +119,25 @@ static void parse_ubx_hnr_pvt()
       }
 
       // Update global GNSS data
-      ugnss_s->fix_quality = pvt_data.gnssFix;
-      ugnss_s->longitude = pvt_data.longitude;
-      ugnss_s->latitude = pvt_data.latitude;
-      ugnss_s->altitude = pvt_data.hMSL;       // In millimeters
-      ugnss_s->speed = pvt_data.gspeed / 1000; // Convert to m/s
-      ugnss_s->heading = pvt_data.headVeh / 1e4;     // In tenths of degrees
-      ugnss_s->timestamp =
-          to_timestamp(pvt_data.year, pvt_data.month, pvt_data.day,
-                       pvt_data.hour, pvt_data.min, pvt_data.sec);
-      ugnss_s->num_satellites = 0; // This info is not in HNR PVT message
+      if (pvt_data.gnssFix == TIME_ONLY_FIX)
+      {
+        ugnss_s->timestamp =
+            to_timestamp(pvt_data.year, pvt_data.month, pvt_data.day,
+                         pvt_data.hour, pvt_data.min, pvt_data.sec);
+      }
+      else if (pvt_data.gnssFix >= 1)
+      {
+        ugnss_s->fix_quality = pvt_data.gnssFix;
+        ugnss_s->longitude = pvt_data.longitude;
+        ugnss_s->latitude = pvt_data.latitude;
+        ugnss_s->altitude = pvt_data.hMSL;         // In millimeters
+        ugnss_s->speed = pvt_data.gspeed / 1000;   // Convert to m/s
+        ugnss_s->heading = pvt_data.headVeh / 1e4; // In tenths of degrees
+        ugnss_s->num_satellites = 0;               // This info is not in HNR PVT message
+        ugnss_s->timestamp =
+            to_timestamp(pvt_data.year, pvt_data.month, pvt_data.day,
+                         pvt_data.hour, pvt_data.min, pvt_data.sec);
+      }
 
       if (uart_interface_s.unlock != NULL)
       {
@@ -247,7 +256,7 @@ int ublox_m8u_hnr_deinit()
   }
 
   free(ugnss_s);
-  ugnss_s = NULL;  
+  ugnss_s = NULL;
   is_initialized = 0;
   return 0;
 }
