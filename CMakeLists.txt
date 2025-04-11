@@ -1,3 +1,3 @@
-idf_component_register(SRCS "src/ublox_m8u_hnr.c" 
-                    INCLUDE_DIRS "inc"
+idf_component_register(SRCS "src/ubx_m8.c" 
+                    INCLUDE_DIRS "src"
                     REQUIRES driver)
